@@ -1,61 +1,73 @@
-import { Component } from '@angular/core';
-import { NestedTreeControl } from '@angular/cdk/tree';
-import { MatTreeNestedDataSource } from '@angular/material/tree';
+import { Component, OnInit } from '@angular/core';
+import { FormControl, FormGroup } from '@angular/forms';
 
-/**
- * File data with nested structure.
- * Each node has a name and an optional list of children.
- */
-interface FileNode {
-  name: string;
-  children?: FileNode[];
-}
+import * as convert from 'xml-js';
+//import { FileSaverService } from 'ngx-filesaver';
 
-const TREE_DATA: FileNode[] = [{
-  name: 'Docs',
-  children: [{
-    name: 'Doc 1'
-  }, {
-    name: 'Doc 2'
-  }, {
-    name: 'Doc 3'
-  }],
-}, {
-  name: 'Images',
-  children: [{
-    name: 'Images Sub 1',
-    children: [{
-      name: 'Image 1'
-    }, {
-      name: 'Image 7'
-    }],
-  }, {
-    name: 'Images Sub 2',
-    children: [{
-      name: 'Image 12'
-    }, {
-      name: 'Image 26'
-    }],
-  }],
-}, {
-  name: 'Projects',
-  children: [],
-}];
+import { ApplicationService } from './app.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
-  treeControl = new NestedTreeControl<FileNode>(node => node.children);
-  dataSource = new MatTreeNestedDataSource<FileNode>();
+export class AppComponent implements OnInit {
+  folders = [];
+  files = [];
+  backPrefix = null;
+  backURL = null;
 
-  constructor() {
-    this.dataSource.data = TREE_DATA;
+  token: string = null;
+
+  fileForm: FormGroup = new FormGroup({
+    prefix: new FormControl('FIRSTHAND_STAGE/'),
+    token: new FormControl(''),
+  })
+
+  constructor(
+    private appService: ApplicationService,
+    //private fsService: FileSaverService
+  ) { }
+
+  ngOnInit(): void { }
+
+  submitData(prefix): void {
+    this.token = this.fileForm.get('token').value;
+    this.callData(prefix);
   }
 
-  hasChild = (_: number, node: FileNode) => !!node.children && node.children.length > 0;
+  callData(prefix): void {
+    this.appService.getFiles(prefix, this.token).
+      subscribe(response => {
+        const results: any = JSON.parse(convert.xml2json(response, { compact: true, spaces: 4 }));
+        this.files = null;
+        this.folders = null;
+        this.backPrefix = results.EnumerationResults.Prefix._text;
+        this.backURL = null;
 
-  isFolder = (_: number, node: FileNode) => !!node.children && node.children.length >= 0;
+        if (this.backPrefix.split('/').length > 2) {
+          this.backURL = `${this.backPrefix.split('/').slice(0, -2).join('/')}/`;
+        }
+
+        if (Array.isArray(results.EnumerationResults.Blobs.Blob)) {
+          this.files = results.EnumerationResults.Blobs.Blob;
+        } else if (results.EnumerationResults.Blobs.Blob) {
+          this.files = [results.EnumerationResults.Blobs.Blob];
+        }
+
+        if (Array.isArray(results.EnumerationResults.Blobs.BlobPrefix)) {
+          this.folders = results.EnumerationResults.Blobs.BlobPrefix;
+        } else if (results.EnumerationResults.Blobs.BlobPrefix) {
+          this.folders = [results.EnumerationResults.Blobs.BlobPrefix];
+        }
+      });
+  }
+
+  downloadFile(filePrefix): void {
+    this.appService.downloadFile(filePrefix, this.token).
+      subscribe(response => {
+        console.log(response);
+        //this.fsService.save((<any>response), 'sample.txt');
+      });
+  }
 }
