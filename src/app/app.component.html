@@ -1,27 +1,37 @@
-<form [formGroup]="fileForm">
-  <div>
-    <label for="">Prefix:</label>
-    <input type="text" name="prefix" formControlName="prefix">
+<div class="file-explorer-container">
+  <form class="file-explorer-form" [formGroup]="fileForm">
+    <div class="form-group mb-3">
+      <label for="prefix">Prefix</label>
+      <div class="input-group mb-2">
+        <input type="text" class="form-control" id="prefix" aria-describedby="prefixHelp" placeholder="Enter Prefix"
+          formControlName="prefix">
+        <div class="input-group-append">
+          <div class="input-group-text">/</div>
+        </div>
+      </div>
+      <small id="prefixHelp" class="form-text text-muted">Your Azure directory name.</small>
+    </div>
+    <div class="form-group mb-3">
+      <label for="token">Token</label>
+      <input type="password" class="form-control" id="token" placeholder="Token" formControlName="token">
+    </div>
+    <button type="submit" class="btn btn-primary" (click)="submitData()">Submit</button>
+  </form>
+
+  <div class="file-explorer-grid-container" *ngIf="folders || files">
+    <ul class="file-explorer-grid">
+      <li *ngIf="backURL" (click)="callData(backURL)">
+        <i class="bi bi-folder-fill"></i>
+        <span class="item-name">[..]</span>
+      </li>
+      <li *ngFor="let item of folders" (click)="callData(item.Name._text)">
+        <i class="bi bi-folder-fill"></i>
+        <span class="item-name">{{item.Name._text.replace(backPrefix, '')}}</span>
+      </li>
+      <li *ngFor="let item of files" (click)="downloadFile(item.Name._text)">
+        <i class="bi bi-file-text-fill"></i>
+        <span class="item-name">{{item.Name._text.replace(backPrefix, '')}}</span>
+      </li>
+    </ul>
   </div>
-  <br>
-  <div>
-    <label for="">Token:</label>
-    <input type="text" name="token" formControlName="token">
-  </div>
-
-  <button (click)="submitData(fileForm.get('prefix').value)">Submit</button>
-</form>
-
-<br>
-
-<div>
-  <div *ngIf="backURL" (click)="callData(backURL)">Back</div>
-
-  <ul>
-    <li *ngFor="let item of folders" (click)="callData(item.Name._text)">
-      {{item.Name._text.replace(backPrefix, '')}}</li>
-    <li *ngFor="let item of files" (click)="downloadFile(item.Name._text)">
-      {{item.Name._text.replace(backPrefix, '')}}
-    </li>
-  </ul>
 </div>

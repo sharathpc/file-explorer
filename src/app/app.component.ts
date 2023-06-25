@@ -12,16 +12,16 @@ import { ApplicationService } from './app.service';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-  folders = [];
-  files = [];
+  folders = null;
+  files = null;
   backPrefix = null;
   backURL = null;
 
   token: string = null;
 
   fileForm: FormGroup = new FormGroup({
-    prefix: new FormControl('FIRSTHAND_STAGE/'),
-    token: new FormControl('sp=racwdl&st=2023-06-24T09:37:47Z&se=2024-06-01T17:37:47Z&sv=2022-11-02&sr=c&sig=8YVssr7V1MYmqv0QqBuvcIMoof%2Fj%2FP6LjsQcIMyEJtw%3D'),
+    prefix: new FormControl('FIRSTHAND_STAGE'),
+    token: new FormControl(''),
   })
 
   constructor(
@@ -31,7 +31,8 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void { }
 
-  submitData(prefix): void {
+  submitData(): void {
+    const prefix = `${this.fileForm.get('prefix').value}/`;
     this.token = this.fileForm.get('token').value;
     this.callData(prefix);
   }
