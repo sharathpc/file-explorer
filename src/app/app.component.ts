@@ -12,6 +12,7 @@ import { ApplicationService } from './app.service';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
+  alerts: any[] = [];
   folders = null;
   files = null;
   backPrefix = null;
@@ -75,6 +76,11 @@ export class AppComponent implements OnInit {
       subscribe(response => {
         const fileName = filePrefix.substring(filePrefix.lastIndexOf('/') + 1);
         this.fsService.save((<any>response), fileName);
+        this.alerts.push({
+          type: 'info',
+          msg: `The file ${fileName} is downloaded successfully`,
+          timeout: 3000
+        });
       });
   }
 }

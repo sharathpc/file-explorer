@@ -3,7 +3,9 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+
 import { FileSaverModule } from 'ngx-filesaver';
+import { AlertModule } from 'ngx-bootstrap/alert';
 
 import { AppComponent } from './app.component';
 
@@ -15,6 +17,7 @@ import { AppComponent } from './app.component';
     FormsModule,
     ReactiveFormsModule,
     FileSaverModule,
+    AlertModule.forRoot(),
   ],
   declarations: [
     AppComponent
