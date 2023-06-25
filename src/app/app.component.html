@@ -9,17 +9,22 @@
           <div class="input-group-text">/</div>
         </div>
       </div>
+      <div class="invalid-feedback">Please enter prefix.</div>
       <small id="prefixHelp" class="form-text text-muted">Your Azure directory name.</small>
     </div>
     <div class="form-group mb-3">
       <label for="token">Token</label>
       <input type="password" class="form-control" id="token" placeholder="Token" formControlName="token">
+      <div class="invalid-feedback">Please enter token.</div>
     </div>
     <button type="submit" class="btn btn-primary" (click)="submitData()">Submit</button>
   </form>
 
-  <div class="file-explorer-grid-container" *ngIf="folders || files">
-    <ul class="file-explorer-grid">
+  <div class="file-explorer-grid-container">
+    <div class="spinner-border" role="status" *ngIf="isLoading">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <ul class="file-explorer-grid" *ngIf="!isLoading && (folders || files)">
       <li *ngIf="backURL" (click)="callData(backURL)">
         <i class="bi bi-folder-fill"></i>
         <span class="item-name">[..]</span>

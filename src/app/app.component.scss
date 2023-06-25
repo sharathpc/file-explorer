@@ -12,12 +12,17 @@
     .file-explorer-grid-container {
         width: 100%;
         margin-top: 1rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
         .file-explorer-grid {
             list-style: none;
             margin: 0;
             border: 1px solid #eeeeee;
             padding: 1rem;
             border-radius: 5px;
+            width: 80%;
+            min-width: 500px;
             li {
                 padding: 5px 10px;
                 cursor: pointer;

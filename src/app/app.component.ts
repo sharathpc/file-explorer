@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 import * as convert from 'xml-js';
 import { FileSaverService } from 'ngx-filesaver';
@@ -16,12 +16,13 @@ export class AppComponent implements OnInit {
   files = null;
   backPrefix = null;
   backURL = null;
+  isLoading = false;
 
   token: string = null;
 
   fileForm: FormGroup = new FormGroup({
-    prefix: new FormControl('FIRSTHAND_STAGE'),
-    token: new FormControl(''),
+    prefix: new FormControl('FIRSTHAND_STAGE', [Validators.required]),
+    token: new FormControl(null, [Validators.required]),
   })
 
   constructor(
@@ -32,12 +33,16 @@ export class AppComponent implements OnInit {
   ngOnInit(): void { }
 
   submitData(): void {
-    const prefix = `${this.fileForm.get('prefix').value}/`;
-    this.token = this.fileForm.get('token').value;
-    this.callData(prefix);
+    this.fileForm.markAllAsTouched();
+    if (this.fileForm.valid) {
+      const prefix = `${this.fileForm.get('prefix').value}/`;
+      this.token = this.fileForm.get('token').value;
+      this.callData(prefix);
+    }
   }
 
   callData(prefix): void {
+    this.isLoading = true;
     this.appService.getFiles(prefix, this.token).
       subscribe(response => {
         const results: any = JSON.parse(convert.xml2json(response, { compact: true, spaces: 4 }));
@@ -61,6 +66,7 @@ export class AppComponent implements OnInit {
         } else if (results.EnumerationResults.Blobs.BlobPrefix) {
           this.folders = [results.EnumerationResults.Blobs.BlobPrefix];
         }
+        this.isLoading = false;
       });
   }
 
