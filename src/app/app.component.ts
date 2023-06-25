@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 
 import * as convert from 'xml-js';
-//import { FileSaverService } from 'ngx-filesaver';
+import { FileSaverService } from 'ngx-filesaver';
 
 import { ApplicationService } from './app.service';
 
@@ -21,12 +21,12 @@ export class AppComponent implements OnInit {
 
   fileForm: FormGroup = new FormGroup({
     prefix: new FormControl('FIRSTHAND_STAGE/'),
-    token: new FormControl(''),
+    token: new FormControl('sp=racwdl&st=2023-06-24T09:37:47Z&se=2024-06-01T17:37:47Z&sv=2022-11-02&sr=c&sig=8YVssr7V1MYmqv0QqBuvcIMoof%2Fj%2FP6LjsQcIMyEJtw%3D'),
   })
 
   constructor(
     private appService: ApplicationService,
-    //private fsService: FileSaverService
+    private fsService: FileSaverService
   ) { }
 
   ngOnInit(): void { }
@@ -66,8 +66,8 @@ export class AppComponent implements OnInit {
   downloadFile(filePrefix): void {
     this.appService.downloadFile(filePrefix, this.token).
       subscribe(response => {
-        console.log(response);
-        //this.fsService.save((<any>response), 'sample.txt');
+        const fileName = filePrefix.substring(filePrefix.lastIndexOf('/') + 1);
+        this.fsService.save((<any>response), fileName);
       });
   }
 }
