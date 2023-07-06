@@ -1,0 +1,22 @@
+<div class="file-explorer-container">
+    <form class="file-explorer-form" [formGroup]="fileForm">
+        <div class="form-group mb-3">
+            <label for="prefix">Prefix</label>
+            <div class="input-group mb-2">
+                <input type="text" class="form-control" id="prefix" aria-describedby="prefixHelp"
+                    placeholder="Enter Prefix" formControlName="prefix">
+                <div class="input-group-append">
+                    <div class="input-group-text">/</div>
+                </div>
+            </div>
+            <div class="invalid-feedback">Please enter prefix.</div>
+            <small id="prefixHelp" class="form-text text-muted">Your Azure directory name.</small>
+        </div>
+        <div class="form-group mb-3">
+            <label for="token">Token</label>
+            <input type="password" class="form-control" id="token" placeholder="Token" formControlName="token">
+            <div class="invalid-feedback">Please enter token.</div>
+        </div>
+        <button type="submit" class="btn btn-primary" (click)="submitData()">Submit</button>
+    </form>
+</div>
