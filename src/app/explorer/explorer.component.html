@@ -1,25 +1,62 @@
 <div class="file-explorer-container">
-    <div *ngFor="let alert of alerts">
-        <alert [type]="alert.type" [dismissOnTimeout]="alert.timeout">{{ alert.msg }}</alert>
+    <div class="file-explorer-header">
+        <h5>File Explorer</h5>
+        <button *ngIf="selectedFile" class="btn btn-outline-primary btn-sm download-button"
+            (click)="downloadFile(selectedFile)">
+            <i class="bi bi-folder-fill"></i>
+            <span>Download</span>
+        </button>
     </div>
-
-    <div class="file-explorer-grid-container">
-        <div class="spinner-border" role="status" *ngIf="isLoading">
-            <span class="visually-hidden">Loading...</span>
+    <div class="file-explorer-body">
+        <div class="file-explorer-grid-aside">
+            <ng-container *ngTemplateOutlet="folderListTemplate; context:{$implicit: foldersObj}">
+            </ng-container>
         </div>
-        <ul class="file-explorer-grid" *ngIf="!isLoading && (folders || files)">
-            <li *ngIf="backURL" (click)="callData(backURL)">
-                <i class="bi bi-folder-fill"></i>
-                <span class="item-name">[..]</span>
-            </li>
-            <li *ngFor="let item of folders" (click)="callData(item.Name._text)">
-                <i class="bi bi-folder-fill"></i>
-                <span class="item-name">{{item.Name._text.replace(backPrefix, '')}}</span>
-            </li>
-            <li *ngFor="let item of files" (click)="downloadFile(item.Name._text)">
-                <i class="bi bi-file-text-fill"></i>
-                <span class="item-name">{{item.Name._text.replace(backPrefix, '')}}</span>
+        <div class="file-explorer-grid-container">
+            <div class="spinner-border" role="status" *ngIf="isLoading"></div>
+            <div class="file-explorer-grid-nav">
+                <ul class="breadcrumb-container">
+                    <li *ngFor="let item of breadcrumb" (click)="callData(item.path)">{{item.label}}</li>
+                </ul>
+                <!-- <input type="search" ngModel="search"> -->
+            </div>
+            <ul class="file-explorer-grid" *ngIf="!isLoading && (folders || files)">
+                <li *ngFor="let item of folders" (dblclick)="callData(item.Name._text)">
+                    <i class="bi bi-folder-fill"></i>
+                    <span class="item-name" [title]="item.label">{{item.label}}</span>
+                </li>
+                <li [ngClass]="{'selected' : selectedFile === item.Name._text}" *ngFor="let item of files"
+                    (click)="selectFile(item.Name._text)">
+                    <i class="bi bi-file-text-fill"></i>
+                    <span class="item-name" [title]="item.label">{{item.label}}</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<ng-template #folderListTemplate let-folder>
+    <div class="spinner-container">
+        <div class="spinner-border spinner-border-sm" role="status" *ngIf="folder.isLoading"></div>
+    </div>
+    <div class="mt-2" *ngIf="!folder.isLoading && folder.isOpen">
+        <div class="no-files" *ngIf="!folder.children.length">
+            <i class="bi bi-folder"></i>
+            <span>No Folders</span>
+        </div>
+        <ul *ngIf="folder.children.length">
+            <li *ngFor="let item of folder.children">
+                <div class="folder-item">
+                    <i class="bi chevron-icon" [ngClass]="item.isOpen ? 'bi-chevron-down' : 'bi-chevron-right'"
+                        (click)="callData(item.Name._text, item)"></i>
+                    <div class="explore-item" (dblclick)="callData(item.Name._text)">
+                        <i class="bi bi-folder-fill"></i>
+                        <span class="item-name">{{item.label}}</span>
+                    </div>
+                </div>
+                <ng-container *ngTemplateOutlet="folderListTemplate; context:{$implicit: item}">
+                </ng-container>
             </li>
         </ul>
     </div>
-</div>
+</ng-template>

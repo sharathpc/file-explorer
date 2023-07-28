@@ -2,36 +2,170 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    .file-explorer-grid-container {
+    height: 500px;
+    border: 1px solid #bdbdbd;
+
+    .file-explorer-header {
         width: 100%;
-        margin-top: 1rem;
+        height: 40px;
+        border-bottom: 1px solid #bdbdbd;
         display: flex;
-        flex-direction: column;
         align-items: center;
-        .file-explorer-grid {
-            list-style: none;
-            margin: 0;
-            border: 1px solid #eeeeee;
-            padding: 1rem;
-            border-radius: 5px;
-            width: 80%;
-            min-width: 500px;
-            li {
-                padding: 5px 10px;
-                cursor: pointer;
-                &:hover {
-                    background-color: #e8e8e8;
-                    .item-name {
-                        color: #5050ff;
+        justify-content: space-between;
+        padding: 0 1.5rem;
+        h5 {
+            margin-bottom: 0;
+        }
+        .download-button {
+            i {
+                margin-right: 0.3rem;
+            }
+        }
+    }
+
+    .file-explorer-body {
+        width: 100%;
+        height: calc(100% - 40px);
+        display: flex;
+        .file-explorer-grid-aside {
+            height: 100%;
+            min-width: 300px;
+            border-right: 1px solid #bdbdbd;
+            overflow: auto;
+            .spinner-container {
+                text-align: center;
+                .spinner-border {
+                    margin: auto;
+                }
+            }
+            .no-files {
+                margin-left: 2.5rem;
+                font-size: 0.9rem;
+                i {
+                    margin-right: 0.3rem;
+                }
+            }
+            ul {
+                list-style: none;
+                padding-left: 0.5rem;
+                li {
+                    padding: 5px 10px;
+                    .folder-item {
+                        display: flex;
+                        i {
+                            &.chevron-icon {
+                                font-weight: bold;
+                                cursor: pointer;
+                                font-size: 0.8rem;
+                            }
+                            &.bi-folder-fill {
+                                color: #d4bd79;
+                                margin-right: 0.3rem;
+                            }
+                        }
+                        .explore-item {
+                            padding: 0 0.5rem;
+                            border-radius: 5px;
+                            user-select: none;
+                            cursor: pointer;
+                            font-size: 0.9rem;
+                            &:hover {
+                                background-color: #f7f7f7;
+                                .item-name {
+                                    color: #5050ff;
+                                }
+                            }
+                        }
                     }
                 }
-                i {
-                    margin-right: 0.5rem;
-                    &.bi-folder-fill {
-                        color: #d4bd79;
+            }
+        }
+        .file-explorer-grid-container {
+            height: 100%;
+            flex-grow: 1;
+            .spinner-border {
+                display: flex;
+                margin: 20% auto;
+            }
+            .file-explorer-grid-nav {
+                width: 100%;
+                height: 40px;
+                border-bottom: 1px solid #bdbdbd;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0 1.5rem;
+                .breadcrumb-container {
+                    display: flex;
+                    list-style: none;
+                    margin: 0;
+                    padding: 0;
+                    li {
+                        padding: 5px 8px;
+                        font-size: 0.8em;
+                        border-radius: 5px;
+                        cursor: default;
+                        &:last-child {
+                            pointer-events: none;
+                        }
+                        &:not(:last-child) {
+                            cursor: pointer;
+                            &:hover {
+                                background-color: #f7f7f7;
+                                color: #5050ff;
+                            }
+                            &::after {
+                                padding-left: 0.8rem;
+                                content: "\f285";
+                                font-family: "bootstrap-icons";
+                                line-height: 1;
+                            }
+                        }
                     }
-                    &.bi-file-text-fill {
-                        color: #5fb7db;
+                }
+            }
+            .file-explorer-grid {
+                list-style: none;
+                margin: 0;
+                padding: 1rem;
+                display: flex;
+                flex-wrap: wrap;
+                li {
+                    padding: 5px 10px;
+                    cursor: pointer;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    width: 8rem;
+                    border-radius: 5px;
+                    border: 1px solid transparent;
+                    margin-right: 5px;
+                    &:hover {
+                        background-color: #f7f7f7;
+                        .item-name {
+                            color: #5050ff;
+                        }
+                    }
+                    &.selected {
+                        background-color: #f7f7f7;
+                        border-color: #d1d1d1;
+                    }
+                    i {
+                        font-size: 2.5rem;
+                        &.bi-folder-fill {
+                            color: #d4bd79;
+                        }
+                        &.bi-file-text-fill {
+                            color: #5fb7db;
+                        }
+                    }
+                    .item-name {
+                        width: 100%;
+                        text-align: center;
+                        overflow: hidden;
+                        white-space: nowrap;
+                        text-overflow: ellipsis;
+                        font-size: 0.9rem;
                     }
                 }
             }

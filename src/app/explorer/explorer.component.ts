@@ -12,11 +12,18 @@ import { ApplicationService } from '../app.service';
 })
 export class ExplorerComponent implements OnInit {
   alerts: any[] = [];
+  foldersObj = {
+    init: true,
+    isLoading: true,
+    isOpen: false,
+    children: []
+  };
+  selectedFile = null;
   folders = null;
   files = null;
-  backPrefix = null;
-  backURL = null;
-  isLoading = true;
+  breadcrumb = [];
+
+  isLoading = false;
   token: string = null;
 
   constructor(
@@ -28,35 +35,100 @@ export class ExplorerComponent implements OnInit {
   ngOnInit(): void {
     const prefix = this.route.snapshot.queryParamMap.get('prefix');
     this.token = this.route.snapshot.queryParamMap.get('token');
-    this.callData(prefix);
+    this.callData(prefix, this.foldersObj);
   }
 
-  callData(prefix): void {
-    this.appService.getFiles(prefix, this.token).
-      subscribe(response => {
-        const results: any = JSON.parse(convert.xml2json(response, { compact: true, spaces: 4 }));
-        this.files = null;
-        this.folders = null;
-        this.backPrefix = results.EnumerationResults.Prefix._text;
-        this.backURL = null;
+  callData(prefix, item?): void {
+    if (item?.isOpen) {
+      item.isOpen = false;
+      item.children = [];
+    } else {
+      this.deselectFile();
+      if (item) {
+        item.isLoading = true;
+        item.isOpen = true;
+      } else {
+        this.isLoading = true;
+      }
+      this.appService.getFiles(prefix, this.token).
+        subscribe(response => {
+          const { breadcrumb, files, folders } = this.formatResponseData(response);
+          this.breadcrumb = breadcrumb;
+          if (item) {
+            item.children = folders;
+            item.isLoading = false;
+            if (item.init) {
+              this.files = files;
+              this.folders = folders;
+              this.isLoading = false;
+            }
+          } else {
+            this.files = files;
+            this.folders = folders;
+            this.isLoading = false;
+          }
+        });
+    }
+  }
 
-        if (this.backPrefix.split('/').length > 2) {
-          this.backURL = `${this.backPrefix.split('/').slice(0, -2).join('/')}/`;
-        }
+  formatResponseData(response): any {
+    const results: any = JSON.parse(convert.xml2json(response, { compact: true, spaces: 4 }));
+    const backPrefix = results.EnumerationResults.Prefix._text;
+    let breadcrumb = [];
+    let files = [];
+    let folders = [];
 
-        if (Array.isArray(results.EnumerationResults.Blobs.Blob)) {
-          this.files = results.EnumerationResults.Blobs.Blob;
-        } else if (results.EnumerationResults.Blobs.Blob) {
-          this.files = [results.EnumerationResults.Blobs.Blob];
-        }
+    if (Array.isArray(results.EnumerationResults.Blobs.Blob)) {
+      files = results.EnumerationResults.Blobs.Blob;
+    } else if (results.EnumerationResults.Blobs.Blob) {
+      files = [results.EnumerationResults.Blobs.Blob];
+    }
 
-        if (Array.isArray(results.EnumerationResults.Blobs.BlobPrefix)) {
-          this.folders = results.EnumerationResults.Blobs.BlobPrefix;
-        } else if (results.EnumerationResults.Blobs.BlobPrefix) {
-          this.folders = [results.EnumerationResults.Blobs.BlobPrefix];
-        }
-        this.isLoading = false;
-      });
+    if (Array.isArray(results.EnumerationResults.Blobs.BlobPrefix)) {
+      folders = results.EnumerationResults.Blobs.BlobPrefix;
+    } else if (results.EnumerationResults.Blobs.BlobPrefix) {
+      folders = [results.EnumerationResults.Blobs.BlobPrefix];
+    }
+
+    files = files.map(file => {
+      file.label = file.Name._text.replace(backPrefix, '');
+      return file;
+    })
+
+    folders = folders.map(folder => {
+      folder.isOpen = false;
+      folder.label = folder.Name._text.replace(backPrefix, '');
+      return folder;
+    })
+
+    breadcrumb = this.buildBreadcrumb(backPrefix);
+
+    return {
+      breadcrumb,
+      files,
+      folders,
+    }
+  }
+
+  buildBreadcrumb(backPrefix): any {
+    const splitItems = backPrefix.split('/').slice(0, -1);
+    let previous = '';
+    return splitItems.map((item, index) => {
+      const value = {
+        label: item,
+        path: (index !== 0 ? `${previous}/${item}/` : `${item}/`)
+      }
+      previous = value.path.slice(0, -1);
+      return value;
+    })
+  }
+
+  selectFile(filePrefix): void {
+    this.selectedFile = filePrefix;
+  }
+
+  deselectFile(): void {
+    this.selectedFile = null;
   }
 
   downloadFile(filePrefix): void {
