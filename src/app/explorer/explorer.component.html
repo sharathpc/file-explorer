@@ -13,13 +13,13 @@
             </ng-container>
         </div>
         <div class="file-explorer-grid-container">
-            <div class="spinner-border" role="status" *ngIf="isLoading"></div>
             <div class="file-explorer-grid-nav">
                 <ul class="breadcrumb-container">
                     <li *ngFor="let item of breadcrumb" (click)="callData(item.path)">{{item.label}}</li>
                 </ul>
                 <!-- <input type="search" ngModel="search"> -->
             </div>
+            <div class="spinner-border" role="status" *ngIf="isLoading"></div>
             <ul class="file-explorer-grid" *ngIf="!isLoading && (folders || files)">
                 <li *ngFor="let item of folders" (dblclick)="callData(item.Name._text)">
                     <i class="bi bi-folder-fill"></i>
