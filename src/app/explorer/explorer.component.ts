@@ -12,12 +12,7 @@ import { ApplicationService } from '../app.service';
 })
 export class ExplorerComponent implements OnInit {
   alerts: any[] = [];
-  foldersObj = {
-    init: true,
-    isLoading: true,
-    isOpen: false,
-    children: []
-  };
+  foldersList: any[] = [];
   selectedFile = null;
   folders = null;
   files = null;
@@ -35,7 +30,26 @@ export class ExplorerComponent implements OnInit {
   ngOnInit(): void {
     const prefix = this.route.snapshot.queryParamMap.get('prefix');
     this.token = this.route.snapshot.queryParamMap.get('token');
-    this.callData(prefix, this.foldersObj);
+    this.foldersList = [{
+      //init: true,
+      isLoading: false,
+      isOpen: false,
+      label: 'Download-Report',
+      name: prefix,
+      children: []
+    }, {
+      isLoading: false,
+      isOpen: false,
+      label: 'Roster-Management',
+      name: null,
+      children: []
+    }, {
+      isLoading: false,
+      isOpen: false,
+      label: 'Member-Management',
+      name: null,
+      children: []
+    }];
   }
 
   callData(prefix, item?): void {
@@ -53,16 +67,16 @@ export class ExplorerComponent implements OnInit {
       this.appService.getFiles(prefix, this.token).
         subscribe(response => {
           const { breadcrumb, files, folders } = this.formatResponseData(response);
-          this.breadcrumb = breadcrumb;
           if (item) {
             item.children = folders;
             item.isLoading = false;
-            if (item.init) {
+            /* if (item.init) {
               this.files = files;
               this.folders = folders;
               this.isLoading = false;
-            }
+            } */
           } else {
+            this.breadcrumb = breadcrumb;
             this.files = files;
             this.folders = folders;
             this.isLoading = false;

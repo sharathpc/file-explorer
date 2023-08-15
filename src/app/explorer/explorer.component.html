@@ -9,8 +9,22 @@
     </div>
     <div class="file-explorer-body">
         <div class="file-explorer-grid-aside">
-            <ng-container *ngTemplateOutlet="folderListTemplate; context:{$implicit: foldersObj}">
-            </ng-container>
+            <div class="mt-2">
+                <ul>
+                    <li *ngFor="let item of foldersList">
+                        <div class="folder-item">
+                            <i class="bi chevron-icon" [ngClass]="item.isOpen ? 'bi-chevron-down' : 'bi-chevron-right'"
+                                (click)="callData(item.name, item)"></i>
+                            <div class="explore-item">
+                                <i class="bi bi-folder-fill"></i>
+                                <span class="item-name">{{item.label}}</span>
+                            </div>
+                        </div>
+                        <ng-container *ngTemplateOutlet="folderListTemplate; context:{$implicit: item}">
+                        </ng-container>
+                    </li>
+                </ul>
+            </div>
         </div>
         <div class="file-explorer-grid-container">
             <div class="file-explorer-grid-nav">
